@@ -1,6 +1,6 @@
 FROM node:20-alpine AS frontend  
 RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-
+ 
 WORKDIR /home/node/app 
 COPY ./frontend/package*.json ./  
 USER node
@@ -27,6 +27,5 @@ RUN pip install --no-cache-dir -r /usr/src/app/requirements.txt \
 COPY . /usr/src/app/  
 COPY --from=frontend /home/node/app/static  /usr/src/app/static/
 WORKDIR /usr/src/app  
-
 EXPOSE 80  
-CMD ["python", "-m", "gunicorn", "app:app"]
+CMD ["uwsgi", "--http", ":80", "--wsgi-file", "app.py", "--callable", "app", "-b","32768"]  
